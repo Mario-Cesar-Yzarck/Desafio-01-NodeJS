@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 const { v4: uuidv4 } = require('uuid');
-const res = require('express/lib/response');
+const res = require('express/lib/response');//?
 
 const app = express();
 
@@ -71,7 +71,11 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const { title, deadline } = request.body;
   const { user } = request;
 
-  const idTodo = user.todos.find((todo) => todo.id === id)
+  const idTodo = user.todos.find((todo) => todo.id === id);
+
+  if(!idTodo) {
+    return response.status(404).json({error: 'Mensagem de error'});
+  }
 
   idTodo.title = title;
   idTodo.deadline = deadline;
@@ -83,7 +87,11 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
   const { id } = request.params;  
   const { user } = request;  
 
-  const idTodo = user.todos.find((todo) => todo.id === id)
+  const idTodo = user.todos.find((todo) => todo.id === id);
+
+  if(!idTodo) {
+    return response.status(404).json({error: 'Mensagem de error'});
+  }
 
   idTodo.done = true;
   //sem explicação de pq deu certo dessa vez. hauhauhau  
@@ -95,11 +103,17 @@ app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
   const { id } = request.params;  
   const { user } = request; 
 
-  const idTodo = user.todos.filter((todo) => todo.id !== id);
+  const idIncludes = user.todos.find((todo) => todo.id === id);
+
+  if(!idIncludes) {
+    return response.status(404).json({error: 'Mensagem de error'});
+  }
+
+  const idTodo = user.todos.filter((todo) => todo.id !== id);  
 
   user.todos = idTodo;
   
-  return response.status(200).send();
+  return response.status(204).send();
 });
 
 module.exports = app;
